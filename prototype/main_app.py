@@ -10,9 +10,9 @@ from qr_scanner import decode_qr
 
 # ---------------------- File Paths ------------------------
 LEAF_IMAGE_PATH = "data/crops/sample_leaf.jpg"
-QR_IMAGE_DIR = "."  # Search in current directory
 MODEL_PATH = "prototype/tflite_model/crop_disease_model.tflite"
 COSTING_PATH = "data/costing/advice_costs.csv"
+QR_IMAGE_ROOT = "data/farmers"
 
 # ---------------------- Check Required Files ------------------------
 required_files = [
@@ -25,16 +25,19 @@ for p in required_files:
     if not os.path.exists(p):
         raise FileNotFoundError(f"Missing file: {p}")
 
-# Check for a QR image with supported extension
+# ---------------------- Locate QR Image ------------------------
+supported_exts = [".jpg", ".jpeg", ".png", ".webp"]
 qr_file = None
-for ext in ['jpg', 'jpeg', 'png']:
-    candidate = os.path.join(QR_IMAGE_DIR, f"qr_sample.{ext}")
-    if os.path.exists(candidate):
-        qr_file = candidate
+for root, _, files in os.walk(QR_IMAGE_ROOT):
+    for file in files:
+        if any(file.lower().endswith(ext) for ext in supported_exts):
+            qr_file = os.path.join(root, file)
+            break
+    if qr_file:
         break
 
 if not qr_file:
-    raise FileNotFoundError("No QR image found (qr_sample.jpg/.jpeg/.png)")
+    raise FileNotFoundError("No QR image found (supports .jpg/.jpeg/.png/.webp)")
 
 # ---------------------- Load TFLite Model ------------------------
 interpreter = tf.lite.Interpreter(model_path=MODEL_PATH)
