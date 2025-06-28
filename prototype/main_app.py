@@ -12,7 +12,13 @@ from qr_scanner import decode_qr         # Your QR decoder function
 # Set up paths
 LEAF_IMAGE_PATH = "data/crops/sample_leaf.jpg"
 MODEL_PATH = "prototype/tflite_model/crop_disease_model.tflite"
-QR_IMAGE_PATH = "qr_sample.jpg"
+
+# Find any QR image in current directory
+qr_candidates = [f for f in os.listdir('.') if f.lower().startswith('qr_sample') and f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+if not qr_candidates:
+    raise FileNotFoundError("No QR image found (qr_sample.jpg/.jpeg/.png)")
+QR_IMAGE_PATH = qr_candidates[0]
+
 COST_FILE = "data/costing/advice_costs.csv"
 
 # Ensure paths exist
