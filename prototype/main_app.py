@@ -1,5 +1,3 @@
-# main_app.py
-
 import os
 import cv2
 import numpy as np
@@ -12,32 +10,35 @@ from qr_scanner import decode_qr
 LEAF_IMAGE_PATH = "data/crops/sample_leaf.jpg"
 MODEL_PATH = "prototype/tflite_model/crop_disease_model.tflite"
 COSTING_PATH = "data/costing/advice_costs.csv"
-QR_IMAGE_ROOT = "data/farmers"
+QR_ROOT_DIR = "data/farmers"  # Recursively search here
 
 # ---------------------- Check Required Files ------------------------
-required_files = [
-    LEAF_IMAGE_PATH,
-    MODEL_PATH,
-    COSTING_PATH
-]
-
+required_files = [LEAF_IMAGE_PATH, MODEL_PATH, COSTING_PATH]
 for p in required_files:
     if not os.path.exists(p):
         raise FileNotFoundError(f"Missing file: {p}")
 
-# ---------------------- Locate QR Image ------------------------
-supported_exts = [".jpg", ".jpeg", ".png", ".webp"]
+# ---------------------- Search for QR image ------------------------
 qr_file = None
-for root, _, files in os.walk(QR_IMAGE_ROOT):
-    for file in files:
-        if any(file.lower().endswith(ext) for ext in supported_exts):
-            qr_file = os.path.join(root, file)
-            break
+supported_exts = ['.png', '.jpg', '.jpeg']
+
+print("🔍 Scanning for QR images...")
+for root, _, files in os.walk(QR_ROOT_DIR):
+    for fname in files:
+        if any(fname.lower().endswith(ext) for ext in supported_exts):
+            path = os.path.join(root, fname)
+            print(f"📂 Found candidate: {path}")
+            data, _, _ = decode_qr(path)
+            if data:
+                print(f"✅ QR decoded: {data}")
+                qr_file = path
+                qr_data = data
+                break
     if qr_file:
         break
 
 if not qr_file:
-    raise FileNotFoundError("No QR image found (supports .jpg/.jpeg/.png/.webp)")
+    raise FileNotFoundError("❌ No QR code image could be decoded in the directory tree.")
 
 # ---------------------- Load TFLite Model ------------------------
 interpreter = tf.lite.Interpreter(model_path=MODEL_PATH)
@@ -61,14 +62,6 @@ def predict_crop_disease(image_path):
     confidence = np.max(output)
 
     return prediction, confidence
-
-# ---------------------- QR Decoding ------------------------
-qr_data, _, _ = decode_qr(qr_file)
-if qr_data:
-    print(f"🔍 QR decoded: {qr_data}")
-else:
-    print("⚠️ QR could not be decoded.")
-    qr_data = "Unknown Farmer"
 
 # ---------------------- Predict ------------------------
 prediction, confidence = predict_crop_disease(LEAF_IMAGE_PATH)
