@@ -1,37 +1,49 @@
 # main_app.py
 
 import os
-import tensorflow as tf
-import numpy as np
-from PIL import Image
 import cv2
-import pandas as pd
-from subsidy_engine import SubsidyEngine  # Now importing the class
-from qr_scanner import decode_qr         # Your QR decoder function
+import numpy as np
+import tensorflow as tf
+from PIL import Image
+from subsidy_engine import SubsidyEngine
+from qr_scanner import decode_qr
 
-# Set up paths
+# ---------------------- File Paths ------------------------
 LEAF_IMAGE_PATH = "data/crops/sample_leaf.jpg"
+QR_IMAGE_DIR = "."  # Search in current directory
 MODEL_PATH = "prototype/tflite_model/crop_disease_model.tflite"
+COSTING_PATH = "data/costing/advice_costs.csv"
 
-# Find any QR image in current directory
-qr_candidates = [f for f in os.listdir('.') if f.lower().startswith('qr_sample') and f.lower().endswith(('.jpg', '.jpeg', '.png'))]
-if not qr_candidates:
-    raise FileNotFoundError("No QR image found (qr_sample.jpg/.jpeg/.png)")
-QR_IMAGE_PATH = qr_candidates[0]
+# ---------------------- Check Required Files ------------------------
+required_files = [
+    LEAF_IMAGE_PATH,
+    MODEL_PATH,
+    COSTING_PATH
+]
 
-COST_FILE = "data/costing/advice_costs.csv"
-
-# Ensure paths exist
-for p in [LEAF_IMAGE_PATH, MODEL_PATH, QR_IMAGE_PATH, COST_FILE]:
+for p in required_files:
     if not os.path.exists(p):
         raise FileNotFoundError(f"Missing file: {p}")
 
-# Load and run the TFLite model
+# Check for a QR image with supported extension
+qr_file = None
+for ext in ['jpg', 'jpeg', 'png']:
+    candidate = os.path.join(QR_IMAGE_DIR, f"qr_sample.{ext}")
+    if os.path.exists(candidate):
+        qr_file = candidate
+        break
+
+if not qr_file:
+    raise FileNotFoundError("No QR image found (qr_sample.jpg/.jpeg/.png)")
+
+# ---------------------- Load TFLite Model ------------------------
 interpreter = tf.lite.Interpreter(model_path=MODEL_PATH)
 interpreter.allocate_tensors()
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
+print("📦 Model input shape:", input_details[0]['shape'])
 
+# ---------------------- Predict Crop Disease ------------------------
 def predict_crop_disease(image_path):
     img = Image.open(image_path).convert('RGB').resize((128, 128))
     img_array = np.array(img) / 255.0
@@ -47,25 +59,29 @@ def predict_crop_disease(image_path):
 
     return prediction, confidence
 
-# Run prediction
+# ---------------------- QR Decoding ------------------------
+qr_data, _, _ = decode_qr(qr_file)
+if qr_data:
+    print(f"🔍 QR decoded: {qr_data}")
+else:
+    print("⚠️ QR could not be decoded.")
+    qr_data = "Unknown Farmer"
+
+# ---------------------- Predict ------------------------
 prediction, confidence = predict_crop_disease(LEAF_IMAGE_PATH)
-print(f"🌾 Predicted class: {prediction} ({confidence*100:.2f}% confidence)")
+print(f"\n🌾 Predicted class: {prediction} ({confidence * 100:.2f}% confidence)")
 
-# Decode QR code
-qr_data, _, _ = decode_qr(QR_IMAGE_PATH)
-if not qr_data:
-    print("⚠️ QR not recognized.")
-    exit()
+# ---------------------- Costing & Subsidy ------------------------
+advice_map = {
+    "Healthy": "Crop Disease Treatment",
+    "Maize___Leaf_Spot": "Crop Disease Treatment",
+    "Tomato___Bacterial_spot": "Crop Disease Treatment"
+}
+advice_type = advice_map.get(prediction, "Crop Disease Treatment")
 
-print(f"📛 QR Data Extracted: {qr_data}")
+engine = SubsidyEngine(COSTING_PATH)
+cost_result = engine.calculate_cost(advice_type, applicant_group="All")
 
-# Load and use subsidy engine
-engine = SubsidyEngine(COST_FILE)
-
-# Simulated logic: use the crop disease prediction as advice type, and QR data as group
-# You may need to adjust how qr_data maps to group names
-result = engine.calculate_cost(advice_type="Crop Disease Treatment", applicant_group=qr_data)
-
-print("\n💸 Subsidy Calculation Result:")
-for k, v in result.items():
+print("\n💸 Subsidy Costing Result:")
+for k, v in cost_result.items():
     print(f"{k}: {v}")
