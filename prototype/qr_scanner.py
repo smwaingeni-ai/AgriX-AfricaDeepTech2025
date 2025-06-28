@@ -9,7 +9,7 @@ def decode_qr(image_path):
     Returns decoded data, image array, and bounding box points.
     """
     if not os.path.exists(image_path):
-        return None, None, None
+        raise FileNotFoundError(f"QR image not found at: {image_path}")
 
     image = cv2.imread(image_path)
     detector = cv2.QRCodeDetector()
@@ -17,11 +17,16 @@ def decode_qr(image_path):
 
     return data, image, points
 
-# Optional test block (can be removed in production use)
+# Optional standalone test block
 if __name__ == "__main__":
-    test_path = "sample_qr.png"  # Replace with your actual path
-    data, img, pts = decode_qr(test_path)
-    if data:
-        print(f"✅ Decoded QR data: {data}")
+    sample_files = ['qr_sample.jpg', 'qr_sample.jpeg', 'qr_sample.png']
+    test_path = next((f for f in sample_files if os.path.exists(f)), None)
+
+    if not test_path:
+        print("⚠️ No sample QR image found in current directory.")
     else:
-        print("⚠️ No QR code detected in the image.")
+        data, img, pts = decode_qr(test_path)
+        if data:
+            print(f"✅ Decoded QR data: {data}")
+        else:
+            print("⚠️ No QR code detected in the image.")
