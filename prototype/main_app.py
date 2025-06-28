@@ -9,7 +9,8 @@ Original file is located at
 
 # Commented out IPython magic to ensure Python compatibility.
 # STEP 1: Install required packages
-!pip install opencv-python-headless --quiet
+
+# !pip install opencv-python-headless --quiet - essential for Colab
 
 # STEP 2: Import packages
 import tensorflow as tf
