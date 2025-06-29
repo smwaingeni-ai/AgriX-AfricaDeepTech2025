@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
+import 'screens/upload_screen.dart';
+import 'screens/advice_screen.dart';
+import 'screens/logbook_screen.dart';
 
-void main() {
-  runApp(const AgriXApp());
-}
+void main() => runApp(const AgriXApp());
 
 class AgriXApp extends StatelessWidget {
   const AgriXApp({super.key});
@@ -12,9 +13,15 @@ class AgriXApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'AgriX',
-      theme: ThemeData(primarySwatch: Colors.green),
-      home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.green),
+      initialRoute: '/',
+      routes: {
+        '/': (_) => const HomeScreen(),
+        '/upload': (_) => const UploadScreen(),
+        '/advice': (_) => const AdviceScreen(),
+        '/logbook': (_) => const LogbookScreen(),
+      },
     );
   }
 }

@@ -20,27 +20,33 @@ class HomeScreen extends StatelessWidget {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 40),
+
+            // Scan QR Button → Navigates to /upload for now
             ElevatedButton.icon(
               onPressed: () {
-                // TODO: Navigate to QR Scan Screen
+                Navigator.pushNamed(context, '/upload');
               },
               icon: const Icon(Icons.qr_code_scanner),
               label: const Text('Scan QR'),
               style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
             ),
             const SizedBox(height: 20),
+
+            // View Advice Button → Navigates to /advice
             ElevatedButton.icon(
               onPressed: () {
-                // TODO: Navigate to View Advice
+                Navigator.pushNamed(context, '/advice');
               },
               icon: const Icon(Icons.insights),
               label: const Text('View Advice'),
               style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
             ),
             const SizedBox(height: 20),
+
+            // Logbook Button → Navigates to /logbook
             ElevatedButton.icon(
               onPressed: () {
-                // TODO: Navigate to Logbook
+                Navigator.pushNamed(context, '/logbook');
               },
               icon: const Icon(Icons.history),
               label: const Text('Logbook'),
