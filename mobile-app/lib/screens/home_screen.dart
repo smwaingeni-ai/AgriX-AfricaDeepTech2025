@@ -83,6 +83,11 @@ class HomeScreen extends StatelessWidget {
                 onTap: () => Navigator.pushNamed(context, '/notifications'),
               ),
               _buildTile(
+                icon: Icons.medical_services,
+                label: 'Get Advice',
+                onTap: () => Navigator.pushNamed(context, '/advice'),
+              ),
+              _buildTile(
                 icon: Icons.book,
                 label: 'Logbook',
                 onTap: () => Navigator.pushNamed(context, '/logbook'),
