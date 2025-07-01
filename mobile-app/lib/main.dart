@@ -3,7 +3,11 @@ import 'screens/home_screen.dart';
 import 'screens/upload_screen.dart';
 import 'screens/advice_screen.dart';
 import 'screens/logbook_screen.dart';
-import 'screens/transaction_screen.dart';  // ✅ New import
+import 'screens/transaction_screen.dart';
+import 'screens/tips_screen.dart';
+import 'screens/agrigpt_screen.dart';
+import 'screens/sync_screen.dart';
+import 'screens/notifications_screen.dart';
 
 void main() => runApp(const AgriXApp());
 
@@ -22,7 +26,11 @@ class AgriXApp extends StatelessWidget {
         '/upload': (_) => const UploadScreen(),
         '/advice': (_) => const AdviceScreen(),
         '/logbook': (_) => const LogbookScreen(),
-        '/transaction': (_) => const TransactionScreen(), // ✅ Register the new screen
+        '/transaction': (_) => const TransactionScreen(result: 'Demo', timestamp: '2025-06-30T00:00:00Z'),
+        '/tips': (_) => const TipsScreen(),
+        '/agrigpt': (_) => const AgriGPTScreen(),
+        '/sync': (_) => const SyncScreen(),
+        '/notifications': (_) => const NotificationsScreen(),
       },
     );
   }
