@@ -1,9 +1,9 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:convert';
+import 'package:share_plus/share_plus.dart';
 
 class LivestockScreen extends StatefulWidget {
   const LivestockScreen({super.key});
@@ -14,18 +14,54 @@ class LivestockScreen extends StatefulWidget {
 
 class _LivestockScreenState extends State<LivestockScreen> {
   File? _image;
-  String? _description;
+  String? _diagnosis;
   final TextEditingController _noteController = TextEditingController();
+
+  final Map<String, String?> _answers = {};
+  final List<String> _questions = [
+    '1. Is the animal refusing to eat or drink?',
+    '2. Is there discharge from eyes, nose, or mouth?',
+    '3. Are there visible skin lesions or wounds?',
+    '4. Is the animal limping or moving abnormally?',
+    '5. Are there signs of abnormal behavior (e.g., aggression or weakness)?',
+  ];
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
+    final picked = await picker.pickImage(source: ImageSource.camera);
     if (picked != null) {
       setState(() {
         _image = File(picked.path);
-        _description = "Possible early signs of foot-and-mouth disease or lameness (Simulated)";
+        _diagnosis = "🐄 Possible infection or injury symptoms detected (Simulated)";
       });
     }
+  }
+
+  void _submitDiagnosis() {
+    final allAnswered = _answers.length == _questions.length && !_answers.containsValue(null);
+
+    if (!allAnswered) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('⚠️ Please answer all questions before submitting.')),
+      );
+      return;
+    }
+
+    final issues = _answers.values.where((a) => a == 'Yes').length;
+    final result = issues >= 3
+        ? '⚠️ Veterinary attention advised. Possible symptoms of illness or distress.'
+        : '✅ No major issues observed. Continue monitoring livestock daily.';
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Livestock Diagnosis'),
+        content: Text(result),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+        ],
+      ),
+    );
   }
 
   Future<void> _saveEntry() async {
@@ -34,7 +70,7 @@ class _LivestockScreenState extends State<LivestockScreen> {
 
     final entry = {
       'timestamp': DateTime.now().toIso8601String(),
-      'description': _description,
+      'diagnosis': _diagnosis ?? '',
       'note': _noteController.text,
     };
 
@@ -48,14 +84,40 @@ class _LivestockScreenState extends State<LivestockScreen> {
     await file.writeAsString(json.encode(logs));
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('✅ Livestock entry saved')),
+      const SnackBar(content: Text('✅ Entry saved')),
     );
   }
 
   void _shareEntry() {
-    if (_description != null) {
-      Share.share('Livestock Health Alert:\n$_description\n\nNote: ${_noteController.text}');
+    if (_diagnosis != null) {
+      Share.share('Livestock Diagnosis:\n$_diagnosis\nNote: ${_noteController.text}');
     }
+  }
+
+  Widget _buildQuestion(String q) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(q, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Row(
+          children: [
+            Radio<String>(
+              value: 'Yes',
+              groupValue: _answers[q],
+              onChanged: (val) => setState(() => _answers[q] = val),
+            ),
+            const Text('Yes'),
+            Radio<String>(
+              value: 'No',
+              groupValue: _answers[q],
+              onChanged: (val) => setState(() => _answers[q] = val),
+            ),
+            const Text('No'),
+          ],
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
   }
 
   @override
@@ -67,43 +129,39 @@ class _LivestockScreenState extends State<LivestockScreen> {
         child: ListView(
           children: [
             ElevatedButton.icon(
-              icon: const Icon(Icons.photo),
-              label: const Text('Pick Livestock Image'),
+              icon: const Icon(Icons.camera_alt),
+              label: const Text('Capture Livestock Image'),
               onPressed: _pickImage,
             ),
+            const SizedBox(height: 10),
+            if (_image != null) Image.file(_image!, height: 200),
+            if (_diagnosis != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Text(_diagnosis!, style: const TextStyle(fontSize: 16)),
+              ),
+            TextField(
+              controller: _noteController,
+              decoration: const InputDecoration(labelText: 'Add Notes'),
+            ),
             const SizedBox(height: 16),
-            if (_image != null) Image.file(_image!, height: 180),
-            if (_description != null) ...[
-              const SizedBox(height: 16),
-              Text(_description!, style: const TextStyle(fontSize: 16)),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _noteController,
-                decoration: const InputDecoration(labelText: 'Add Notes (Optional)'),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.save),
-                label: const Text('Save'),
-                onPressed: _saveEntry,
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.share),
-                label: const Text('Share'),
-                onPressed: _shareEntry,
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.send),
-                label: const Text('Escalate to AgriX'),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('📨 Sent to AgriX support')),
-                  );
-                },
-              ),
-            ]
+            ..._questions.map(_buildQuestion),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.check),
+              label: const Text('Submit Diagnosis'),
+              onPressed: _submitDiagnosis,
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.save),
+              label: const Text('Save'),
+              onPressed: _saveEntry,
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.share),
+              label: const Text('Share'),
+              onPressed: _shareEntry,
+            ),
           ],
         ),
       ),
