@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tflite/tflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'transaction_screen.dart'; // Make sure this file exists
 
 class UploadScreen extends StatefulWidget {
   const UploadScreen({super.key});
@@ -63,6 +64,7 @@ class _UploadScreenState extends State<UploadScreen> {
         final label = output[0]['label'];
         final confidence = (output[0]['confidence'] * 100).toStringAsFixed(1);
         _result = '🌾 Predicted: $label\nConfidence: $confidence%';
+        _navigateToTransactionScreen(); // Navigate after result
       } else {
         _result = '⚠️ No linked diagnostic or advice found.';
         _noMatch = true;
@@ -99,6 +101,18 @@ class _UploadScreenState extends State<UploadScreen> {
     if (_result != null) {
       Share.share('AgriX Diagnostic Result:\n\n$_result');
     }
+  }
+
+  void _navigateToTransactionScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TransactionScreen(
+          result: _result!,
+          timestamp: DateTime.now().toIso8601String(),
+        ),
+      ),
+    );
   }
 
   Widget _buildActionButtons() {
