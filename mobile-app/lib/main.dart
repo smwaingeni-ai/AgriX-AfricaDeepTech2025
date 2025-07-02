@@ -7,7 +7,7 @@ import 'screens/advice_screen.dart';
 import 'screens/logbook_screen.dart';
 import 'screens/transaction_screen.dart';
 
-// Placeholder or auxiliary screens
+// Value-add screens
 import 'screens/tips_screen.dart';
 import 'screens/agrigpt_screen.dart';
 import 'screens/sync_screen.dart';
@@ -15,6 +15,7 @@ import 'screens/notifications_screen.dart';
 import 'screens/soil_screen.dart';
 import 'screens/crops_screen.dart';
 import 'screens/livestock_screen.dart';
+import 'screens/farmer_registration.dart'; // ✅ NEW: Farmer registration with QR
 
 void main() => runApp(const AgriXApp());
 
@@ -38,14 +39,19 @@ class AgriXApp extends StatelessWidget {
               timestamp: '2025-06-30T00:00:00Z',
             ),
 
-        // Added routes for full navigation
+        // Diagnostic and productivity tools
+        '/soil': (_) => const SoilScreen(),
+        '/crops': (_) => const CropsScreen(),
+        '/livestock': (_) => const LivestockScreen(),
+
+        // Informational and assistive tools
         '/tips': (_) => const TipsScreen(),
         '/agrigpt': (_) => const AgriGPTScreen(),
         '/sync': (_) => const SyncScreen(),
         '/notifications': (_) => const NotificationsScreen(),
-        '/soil': (_) => const SoilScreen(),
-        '/crops': (_) => const CropsScreen(),
-        '/livestock': (_) => const LivestockScreen(),
+
+        // ✅ Newly added route
+        '/register': (_) => const FarmerRegistrationScreen(),
       },
     );
   }
