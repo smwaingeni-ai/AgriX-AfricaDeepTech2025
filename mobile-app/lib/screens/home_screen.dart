@@ -92,6 +92,16 @@ class HomeScreen extends StatelessWidget {
                 label: 'Logbook',
                 onTap: () => Navigator.pushNamed(context, '/logbook'),
               ),
+              _buildTile(
+                icon: Icons.person_add,
+                label: 'Register',
+                onTap: () => Navigator.pushNamed(context, '/register'),
+              ),
+              _buildTile(
+                icon: Icons.credit_card,
+                label: 'Loan',
+                onTap: () => Navigator.pushNamed(context, '/loan'),
+              ),
             ],
           ),
         ),
