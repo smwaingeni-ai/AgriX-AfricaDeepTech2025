@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
-// Core screens
+// Core Screens
 import 'screens/home_screen.dart';
 import 'screens/upload_screen.dart';
 import 'screens/advice_screen.dart';
 import 'screens/logbook_screen.dart';
 import 'screens/transaction_screen.dart';
 import 'screens/farmer_registration.dart';
+import 'screens/loan_application.dart';
 
-// Feature screens
+// Feature Screens
 import 'screens/tips_screen.dart';
 import 'screens/agrigpt_screen.dart';
 import 'screens/sync_screen.dart';
@@ -39,14 +40,17 @@ class AgriXApp extends StatelessWidget {
               timestamp: '2025-06-30T00:00:00Z',
             ),
 
-        // Farmer registration
+        // Farmer Features
         '/register': (_) => const FarmerRegistrationScreen(),
+        '/loan': (_) => const LoanApplicationScreen(),
 
-        // Feature routes
+        // Feature Routes
         '/tips': (_) => const TipsScreen(),
         '/agrigpt': (_) => const AgriGPTScreen(),
         '/sync': (_) => const SyncScreen(),
         '/notifications': (_) => const NotificationsScreen(),
+
+        // Diagnostic Routes
         '/soil': (_) => const SoilScreen(),
         '/crops': (_) => const CropsScreen(),
         '/livestock': (_) => const LivestockScreen(),
