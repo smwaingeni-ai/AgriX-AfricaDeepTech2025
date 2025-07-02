@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:flutter/services.dart';
 import '../models/farmer_profile.dart';
 
 class FarmerRegistrationScreen extends StatefulWidget {
@@ -32,17 +35,23 @@ class _FarmerRegistrationScreenState extends State<FarmerRegistrationScreen> {
     final location = _locationController.text.trim();
     final farmSize = double.tryParse(_farmSizeController.text.trim()) ?? 0.0;
 
-    // Generate QR data and image
     final qrData = json.encode({'id': id, 'name': name, 'nationalId': nationalId});
-    final qrImage = QrImageView(data: qrData, size: 200);
+
+    final painter = QrPainter(
+      data: qrData,
+      version: QrVersions.auto,
+      gapless: true,
+      color: const Color(0xFF000000),
+      emptyColor: const Color(0xFFFFFFFF),
+    );
 
     final dir = await getApplicationDocumentsDirectory();
     final qrPath = '${dir.path}/$id-qr.png';
 
-    final boundary = await qrImage.toImage(pixelRatio: 3.0);
-    final byteData = await boundary.toByteData(format: ImageByteFormat.png);
-    final bytes = byteData!.buffer.asUint8List();
-    await File(qrPath).writeAsBytes(bytes);
+    final picData = await painter.toImageData(300, format: ImageByteFormat.png);
+    final buffer = picData!.buffer.asUint8List();
+
+    await File(qrPath).writeAsBytes(buffer);
 
     final profile = FarmerProfile(
       id: id,
