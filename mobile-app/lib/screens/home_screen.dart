@@ -49,7 +49,7 @@ class HomeScreen extends StatelessWidget {
             children: [
               _buildTile(
                 icon: Icons.person_add,
-                label: 'Register Farmer',
+                label: 'Register',
                 onTap: () => Navigator.pushNamed(context, '/register'),
               ),
               _buildTile(
@@ -58,29 +58,19 @@ class HomeScreen extends StatelessWidget {
                 onTap: () => Navigator.pushNamed(context, '/loan'),
               ),
               _buildTile(
-                icon: Icons.assignment,
-                label: 'Officer Tasks',
-                onTap: () => Navigator.pushNamed(context, '/officer/tasks'),
-              ),
-              _buildTile(
-                icon: Icons.fact_check,
-                label: 'Assessments',
-                onTap: () => Navigator.pushNamed(context, '/officer/assessments'),
-              ),
-              _buildTile(
                 icon: Icons.grass,
                 label: 'Crops',
-                onTap: () => Navigator.pushNamed(context, '/upload'),
+                onTap: () => Navigator.pushNamed(context, '/crops'),
               ),
               _buildTile(
                 icon: Icons.eco,
                 label: 'Soil',
-                onTap: () => Navigator.pushNamed(context, '/advice', arguments: 'soil'),
+                onTap: () => Navigator.pushNamed(context, '/soil'),
               ),
               _buildTile(
                 icon: Icons.pets,
                 label: 'Livestock',
-                onTap: () => Navigator.pushNamed(context, '/advice', arguments: 'livestock'),
+                onTap: () => Navigator.pushNamed(context, '/livestock'),
               ),
               _buildTile(
                 icon: Icons.tips_and_updates,
@@ -103,9 +93,19 @@ class HomeScreen extends StatelessWidget {
                 onTap: () => Navigator.pushNamed(context, '/notifications'),
               ),
               _buildTile(
+                icon: Icons.medical_services,
+                label: 'Get Advice',
+                onTap: () => Navigator.pushNamed(context, '/advice'),
+              ),
+              _buildTile(
                 icon: Icons.book,
                 label: 'Logbook',
                 onTap: () => Navigator.pushNamed(context, '/logbook'),
+              ),
+              _buildTile(
+                icon: Icons.shopping_cart,
+                label: 'Agri Market',
+                onTap: () => Navigator.pushNamed(context, '/market'),
               ),
             ],
           ),
