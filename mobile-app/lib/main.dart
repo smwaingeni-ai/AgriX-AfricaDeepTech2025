@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Core Screens
+// Core screens
 import 'screens/home_screen.dart';
 import 'screens/upload_screen.dart';
 import 'screens/advice_screen.dart';
@@ -9,7 +9,11 @@ import 'screens/transaction_screen.dart';
 import 'screens/farmer_registration.dart';
 import 'screens/loan_application.dart';
 
-// Feature Screens
+// Officer screens
+import 'screens/officer_task_screen.dart';
+import 'screens/officer_assessment_screen.dart';
+
+// Feature screens
 import 'screens/tips_screen.dart';
 import 'screens/agrigpt_screen.dart';
 import 'screens/sync_screen.dart';
@@ -40,17 +44,19 @@ class AgriXApp extends StatelessWidget {
               timestamp: '2025-06-30T00:00:00Z',
             ),
 
-        // Farmer Features
+        // Farmer
         '/register': (_) => const FarmerRegistrationScreen(),
         '/loan': (_) => const LoanApplicationScreen(),
 
-        // Feature Routes
+        // Officer
+        '/officer/tasks': (_) => const OfficerTaskScreen(),
+        '/officer/assessments': (_) => const OfficerAssessmentScreen(),
+
+        // Feature
         '/tips': (_) => const TipsScreen(),
         '/agrigpt': (_) => const AgriGPTScreen(),
         '/sync': (_) => const SyncScreen(),
         '/notifications': (_) => const NotificationsScreen(),
-
-        // Diagnostic Routes
         '/soil': (_) => const SoilScreen(),
         '/crops': (_) => const CropsScreen(),
         '/livestock': (_) => const LivestockScreen(),
