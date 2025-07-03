@@ -5,7 +5,11 @@ class FarmerProfile {
   final String location;
   final double farmSizeHectares;
   final bool govtAffiliated;
-  final bool subsidised;
+  final String qrImagePath;
+  final double? latitude;
+  final double? longitude;
+  final String? locality;
+  final String? district;
 
   FarmerProfile({
     required this.id,
@@ -14,24 +18,38 @@ class FarmerProfile {
     required this.location,
     required this.farmSizeHectares,
     required this.govtAffiliated,
-  }) : subsidised = govtAffiliated;
+    required this.qrImagePath,
+    this.latitude,
+    this.longitude,
+    this.locality,
+    this.district,
+  });
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'nationalId': nationalId,
-    'location': location,
-    'farmSizeHectares': farmSizeHectares,
-    'govtAffiliated': govtAffiliated,
-    'subsidised': subsidised,
-  };
+        'id': id,
+        'name': name,
+        'nationalId': nationalId,
+        'location': location,
+        'farmSizeHectares': farmSizeHectares,
+        'govtAffiliated': govtAffiliated,
+        'qrImagePath': qrImagePath,
+        'latitude': latitude,
+        'longitude': longitude,
+        'locality': locality,
+        'district': district,
+      };
 
   static FarmerProfile fromJson(Map<String, dynamic> json) => FarmerProfile(
-    id: json['id'],
-    name: json['name'],
-    nationalId: json['nationalId'],
-    location: json['location'],
-    farmSizeHectares: json['farmSizeHectares'],
-    govtAffiliated: json['govtAffiliated'],
-  );
+        id: json['id'],
+        name: json['name'],
+        nationalId: json['nationalId'],
+        location: json['location'],
+        farmSizeHectares: (json['farmSizeHectares'] ?? 0).toDouble(),
+        govtAffiliated: json['govtAffiliated'] ?? false,
+        qrImagePath: json['qrImagePath'],
+        latitude: (json['latitude'] ?? 0.0).toDouble(),
+        longitude: (json['longitude'] ?? 0.0).toDouble(),
+        locality: json['locality'],
+        district: json['district'],
+      );
 }
