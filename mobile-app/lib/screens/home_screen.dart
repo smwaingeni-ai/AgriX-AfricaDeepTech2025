@@ -48,6 +48,26 @@ class HomeScreen extends StatelessWidget {
             runSpacing: 10,
             children: [
               _buildTile(
+                icon: Icons.person_add,
+                label: 'Register Farmer',
+                onTap: () => Navigator.pushNamed(context, '/register'),
+              ),
+              _buildTile(
+                icon: Icons.credit_card,
+                label: 'Loan',
+                onTap: () => Navigator.pushNamed(context, '/loan'),
+              ),
+              _buildTile(
+                icon: Icons.assignment,
+                label: 'Officer Tasks',
+                onTap: () => Navigator.pushNamed(context, '/officer/tasks'),
+              ),
+              _buildTile(
+                icon: Icons.fact_check,
+                label: 'Assessments',
+                onTap: () => Navigator.pushNamed(context, '/officer/assessments'),
+              ),
+              _buildTile(
                 icon: Icons.grass,
                 label: 'Crops',
                 onTap: () => Navigator.pushNamed(context, '/upload'),
@@ -83,24 +103,9 @@ class HomeScreen extends StatelessWidget {
                 onTap: () => Navigator.pushNamed(context, '/notifications'),
               ),
               _buildTile(
-                icon: Icons.medical_services,
-                label: 'Get Advice',
-                onTap: () => Navigator.pushNamed(context, '/advice'),
-              ),
-              _buildTile(
                 icon: Icons.book,
                 label: 'Logbook',
                 onTap: () => Navigator.pushNamed(context, '/logbook'),
-              ),
-              _buildTile(
-                icon: Icons.person_add,
-                label: 'Register',
-                onTap: () => Navigator.pushNamed(context, '/register'),
-              ),
-              _buildTile(
-                icon: Icons.credit_card,
-                label: 'Loan',
-                onTap: () => Navigator.pushNamed(context, '/loan'),
               ),
             ],
           ),
