@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'localization/app_localizations.dart';
 
 // Core Screens
 import 'screens/home_screen.dart';
@@ -41,6 +43,19 @@ class AgriXApp extends StatelessWidget {
       title: 'AgriX',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.green),
+      locale: const Locale('en'), // Default to English (can be user selected)
+      supportedLocales: const [
+        Locale('en'),
+        Locale('fr'),
+        Locale('pt'),
+        Locale('sn'),
+      ],
+      localizationsDelegates: const [
+        AppLocalizationsDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       initialRoute: '/',
       routes: {
         // Core Navigation
