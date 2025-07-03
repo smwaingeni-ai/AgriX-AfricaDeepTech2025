@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'localization/app_localizations.dart';
+import 'screens/auth_gate.dart'; // ✅ Biometric gate
 
 // Core Screens
 import 'screens/home_screen.dart';
@@ -43,7 +44,7 @@ class AgriXApp extends StatelessWidget {
       title: 'AgriX',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.green),
-      locale: const Locale('en'), // Default to English (can be user selected)
+      locale: const Locale('en'),
       supportedLocales: const [
         Locale('en'),
         Locale('fr'),
@@ -56,8 +57,10 @@ class AgriXApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      initialRoute: '/',
+      initialRoute: '/auth', // ✅ Start with biometric gate
       routes: {
+        '/auth': (_) => const AuthGate(), // ✅ Entry point
+
         // Core Navigation
         '/': (_) => const HomeScreen(),
         '/upload': (_) => const UploadScreen(),
