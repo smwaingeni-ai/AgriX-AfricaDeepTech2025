@@ -1,18 +1,21 @@
 import 'package:local_auth/local_auth.dart';
 
 class BiometricAuthService {
-  final _auth = LocalAuthentication();
+  final LocalAuthentication _auth = LocalAuthentication();
 
   Future<bool> authenticate() async {
-    try {
-      final canCheck = await _auth.canCheckBiometrics;
-      if (!canCheck) return false;
+    final canCheck = await _auth.canCheckBiometrics;
+    if (!canCheck) return false;
 
+    final isAvailable = await _auth.isDeviceSupported();
+    if (!isAvailable) return false;
+
+    try {
       return await _auth.authenticate(
-        localizedReason: 'Please authenticate to access AgriX',
+        localizedReason: 'Please authenticate to continue',
         options: const AuthenticationOptions(
-          stickyAuth: true,
           biometricOnly: true,
+          stickyAuth: true,
         ),
       );
     } catch (e) {
