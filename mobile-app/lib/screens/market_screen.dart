@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/market_item.dart';
 import '../services/market_service.dart';
-import 'market_detail_screen.dart';
 import 'market_item_form.dart';
+import 'market_detail_screen.dart';
 import 'market_invite_screen.dart';
 
 class MarketScreen extends StatefulWidget {
@@ -26,12 +26,26 @@ class _MarketScreenState extends State<MarketScreen> {
     setState(() => _items = items);
   }
 
-  void _navigateToAddItem() async {
+  void _goToCreateItem() async {
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const MarketItemForm()),
+      MaterialPageRoute(builder: (_) => const MarketItemFormScreen()),
     );
     _loadItems();
+  }
+
+  void _goToInviteScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const MarketInviteScreen()),
+    );
+  }
+
+  void _goToDetail(MarketItem item) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => MarketDetailScreen(item: item)),
+    );
   }
 
   @override
@@ -41,28 +55,38 @@ class _MarketScreenState extends State<MarketScreen> {
         title: const Text('Agri Market'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _navigateToAddItem,
+            icon: const Icon(Icons.group_add),
+            onPressed: _goToInviteScreen,
+            tooltip: "Invite to Market",
           ),
           IconButton(
-            icon: const Icon(Icons.group_add),
-            onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const MarketInviteScreen())),
-          )
+            icon: const Icon(Icons.add),
+            onPressed: _goToCreateItem,
+            tooltip: "Add Listing",
+          ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: _items.length,
-        itemBuilder: (ctx, i) {
-          final item = _items[i];
-          return ListTile(
-            title: Text(item.title),
-            subtitle: Text('${item.category} • ${item.location}'),
-            trailing: Text('\$${item.price.toStringAsFixed(2)}'),
-            onTap: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => MarketDetailScreen(item: item))),
-          );
-        },
+      body: _items.isEmpty
+          ? const Center(child: Text('No market listings available.'))
+          : ListView.builder(
+              itemCount: _items.length,
+              itemBuilder: (context, index) {
+                final item = _items[index];
+                return Card(
+                  margin: const EdgeInsets.all(8),
+                  child: ListTile(
+                    title: Text(item.title),
+                    subtitle: Text('${item.type} • ${item.location}'),
+                    trailing: const Icon(Icons.arrow_forward_ios),
+                    onTap: () => _goToDetail(item),
+                  ),
+                );
+              },
+            ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _goToCreateItem,
+        tooltip: 'Add New Listing',
+        child: const Icon(Icons.add),
       ),
     );
   }
