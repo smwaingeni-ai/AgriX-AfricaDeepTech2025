@@ -63,6 +63,16 @@ class _ContractOfferFormScreenState extends State<ContractOfferFormScreen> {
                       onSaved: (val) => _contract.duration = val ?? '',
                     ),
                     TextFormField(
+                      decoration: const InputDecoration(labelText: 'Crop or Livestock Type'),
+                      onSaved: (val) => _contract.cropOrLivestockType = val ?? '',
+                      validator: (val) => val!.isEmpty ? 'Required' : null,
+                    ),
+                    TextFormField(
+                      decoration: const InputDecoration(labelText: 'Location'),
+                      onSaved: (val) => _contract.location = val ?? '',
+                      validator: (val) => val!.isEmpty ? 'Required' : null,
+                    ),
+                    TextFormField(
                       decoration: const InputDecoration(labelText: 'Contract Terms / Description'),
                       maxLines: 4,
                       onSaved: (val) => _contract.terms = val ?? '',
