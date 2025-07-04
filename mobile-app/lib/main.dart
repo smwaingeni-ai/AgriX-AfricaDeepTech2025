@@ -1,101 +1,95 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'localization/app_localizations.dart';
-import 'screens/auth_gate.dart'; // ✅ Biometric gate
+import 'dart:convert';
 
-// Core Screens
-import 'screens/home_screen.dart';
-import 'screens/upload_screen.dart';
-import 'screens/advice_screen.dart';
-import 'screens/logbook_screen.dart';
-import 'screens/transaction_screen.dart';
-import 'screens/farmer_registration.dart';
-import 'screens/loan_application.dart';
+enum ListingType { sale, lease, barter, request }
+enum ListingCategory { land, crops, livestock, equipment, services }
+enum InvestmentStatus { open, indifferent, closed }
 
-// Diagnostic Screens
-import 'screens/soil_screen.dart';
-import 'screens/crops_screen.dart';
-import 'screens/livestock_screen.dart';
+class MarketItem {
+  final String id;
+  final String title;
+  final String description;
+  final ListingType type;
+  final ListingCategory category;
+  final List<String> imagePaths;
+  final String location;
+  final double price;
+  final List<String> paymentOptions;
+  final DateTime createdAt;
 
-// Feature Screens
-import 'screens/tips_screen.dart';
-import 'screens/agrigpt_screen.dart';
-import 'screens/sync_screen.dart';
-import 'screens/notifications_screen.dart';
+  // Geolocation
+  final double latitude;
+  final double longitude;
 
-// Officer Screens
-import 'screens/officer_task_screen.dart';
-import 'screens/officer_assessment_screen.dart';
+  // Investment-related fields
+  final InvestmentStatus investmentStatus;
+  final bool isLoanEligible;
+  final bool ministryFinanceRequested;
+  final List<String> investorOffers; // Could be investor IDs or offer IDs
 
-// Agri Market Screens
-import 'screens/market_screen.dart';
-import 'screens/market_item_form.dart';
-import 'screens/market_detail_screen.dart';
-import 'screens/market_invite_screen.dart';
+  MarketItem({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.type,
+    required this.category,
+    required this.imagePaths,
+    required this.location,
+    required this.price,
+    required this.paymentOptions,
+    required this.createdAt,
+    required this.latitude,
+    required this.longitude,
+    required this.investmentStatus,
+    required this.isLoanEligible,
+    required this.ministryFinanceRequested,
+    required this.investorOffers,
+  });
 
-void main() => runApp(const AgriXApp());
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'description': description,
+        'type': type.name,
+        'category': category.name,
+        'imagePaths': imagePaths,
+        'location': location,
+        'price': price,
+        'paymentOptions': paymentOptions,
+        'createdAt': createdAt.toIso8601String(),
+        'latitude': latitude,
+        'longitude': longitude,
+        'investmentStatus': investmentStatus.name,
+        'isLoanEligible': isLoanEligible,
+        'ministryFinanceRequested': ministryFinanceRequested,
+        'investorOffers': investorOffers,
+      };
 
-class AgriXApp extends StatelessWidget {
-  const AgriXApp({super.key});
+  factory MarketItem.fromJson(Map<String, dynamic> json) => MarketItem(
+        id: json['id'],
+        title: json['title'],
+        description: json['description'],
+        type: ListingType.values.firstWhere((e) => e.name == json['type']),
+        category:
+            ListingCategory.values.firstWhere((e) => e.name == json['category']),
+        imagePaths: List<String>.from(json['imagePaths']),
+        location: json['location'],
+        price: (json['price'] as num).toDouble(),
+        paymentOptions: List<String>.from(json['paymentOptions']),
+        createdAt: DateTime.parse(json['createdAt']),
+        latitude: (json['latitude'] as num).toDouble(),
+        longitude: (json['longitude'] as num).toDouble(),
+        investmentStatus: InvestmentStatus.values
+            .firstWhere((e) => e.name == json['investmentStatus']),
+        isLoanEligible: json['isLoanEligible'],
+        ministryFinanceRequested: json['ministryFinanceRequested'],
+        investorOffers: List<String>.from(json['investorOffers']),
+      );
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'AgriX',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.green),
-      locale: const Locale('en'),
-      supportedLocales: const [
-        Locale('en'),
-        Locale('fr'),
-        Locale('pt'),
-        Locale('sn'),
-      ],
-      localizationsDelegates: const [
-        AppLocalizationsDelegate(),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      initialRoute: '/auth', // ✅ Start with biometric gate
-      routes: {
-        '/auth': (_) => const AuthGate(), // ✅ Entry point
+  static List<MarketItem> decode(String marketJson) =>
+      (jsonDecode(marketJson) as List<dynamic>)
+          .map<MarketItem>((item) => MarketItem.fromJson(item))
+          .toList();
 
-        // Core Navigation
-        '/': (_) => const HomeScreen(),
-        '/upload': (_) => const UploadScreen(),
-        '/advice': (_) => const AdviceScreen(),
-        '/logbook': (_) => const LogbookScreen(),
-        '/transaction': (_) => const TransactionScreen(
-              result: 'Demo',
-              timestamp: '2025-06-30T00:00:00Z',
-            ),
-
-        // Farmer & Loans
-        '/register': (_) => const FarmerRegistrationScreen(),
-        '/loan': (_) => const LoanApplicationScreen(),
-
-        // Diagnosis Categories
-        '/soil': (_) => const SoilScreen(),
-        '/crops': (_) => const CropsScreen(),
-        '/livestock': (_) => const LivestockScreen(),
-
-        // Utility Features
-        '/tips': (_) => const TipsScreen(),
-        '/agrigpt': (_) => const AgriGPTScreen(),
-        '/sync': (_) => const SyncScreen(),
-        '/notifications': (_) => const NotificationsScreen(),
-
-        // Officer Functions
-        '/officer/tasks': (_) => const OfficerTaskScreen(),
-        '/officer/assessments': (_) => const OfficerAssessmentScreen(),
-
-        // Agri Market
-        '/market': (_) => const MarketScreen(),
-        '/market/new': (_) => const MarketItemFormScreen(),
-        '/market/detail': (_) => const MarketDetailScreen(),
-        '/market/invite': (_) => const MarketInviteScreen(),
-      },
-    );
-  }
+  static String encode(List<MarketItem> items) =>
+      jsonEncode(items.map((e) => e.toJson()).toList());
 }
