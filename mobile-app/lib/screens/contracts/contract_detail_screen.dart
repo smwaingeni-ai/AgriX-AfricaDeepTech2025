@@ -45,7 +45,7 @@ class ContractDetailScreen extends StatelessWidget {
         ),
       ),
     );
-  }
+  } 
 
   Widget _buildDetailTile(String label, String value) {
     return Column(
