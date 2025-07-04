@@ -1,34 +1,64 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+
 import '../models/market_item.dart';
+import '../models/investment_offer.dart';
 
 class MarketService {
-  static Future<String> _localPath() async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
+  // File names
+  static const String _marketFile = 'market_items.json';
+  static const String _offersFile = 'investment_offers.json';
+
+  // MARK: - Market Items
+
+  Future<String> _getFilePath(String filename) async {
+    final dir = await getApplicationDocumentsDirectory();
+    return '${dir.path}/$filename';
   }
 
-  static Future<File> _localFile() async {
-    final path = await _localPath();
-    return File('$path/market_items.json');
-  }
-
-  static Future<List<MarketItem>> loadItems() async {
+  Future<List<MarketItem>> loadMarketItems() async {
     try {
-      final file = await _localFile();
-      if (!file.existsSync()) return [];
-      final contents = await file.readAsString();
-      final List<dynamic> jsonData = json.decode(contents);
-      return jsonData.map((e) => MarketItem.fromJson(e)).toList();
-    } catch (_) {
-      return [];
-    }
+      final path = await _getFilePath(_marketFile);
+      final file = File(path);
+      if (await file.exists()) {
+        final jsonStr = await file.readAsString();
+        return MarketItem.decode(jsonStr);
+      }
+    } catch (_) {}
+    return [];
   }
 
-  static Future<void> saveItems(List<MarketItem> items) async {
-    final file = await _localFile();
-    final jsonString = json.encode(items.map((e) => e.toJson()).toList());
-    await file.writeAsString(jsonString);
+  Future<void> saveMarketItems(List<MarketItem> items) async {
+    final path = await _getFilePath(_marketFile);
+    final file = File(path);
+    await file.writeAsString(MarketItem.encode(items));
+  }
+
+  // MARK: - Investment Offers
+
+  Future<List<InvestmentOffer>> loadInvestmentOffers() async {
+    try {
+      final path = await _getFilePath(_offersFile);
+      final file = File(path);
+      if (await file.exists()) {
+        final jsonStr = await file.readAsString();
+        return InvestmentOffer.decode(jsonStr);
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  Future<void> saveInvestmentOffers(List<InvestmentOffer> offers) async {
+    final path = await _getFilePath(_offersFile);
+    final file = File(path);
+    await file.writeAsString(InvestmentOffer.encode(offers));
+  }
+
+  // Optional: Append a new offer to existing offers
+  Future<void> addInvestmentOffer(InvestmentOffer newOffer) async {
+    final offers = await loadInvestmentOffers();
+    offers.add(newOffer);
+    await saveInvestmentOffers(offers);
   }
 }
