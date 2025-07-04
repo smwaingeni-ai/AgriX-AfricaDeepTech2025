@@ -1,86 +1,194 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 import '../models/market_item.dart';
 import '../services/market_service.dart';
 
-class MarketItemForm extends StatefulWidget {
-  const MarketItemForm({super.key});
+class MarketItemFormScreen extends StatefulWidget {
+  const MarketItemFormScreen({super.key});
 
   @override
-  State<MarketItemForm> createState() => _MarketItemFormState();
+  State<MarketItemFormScreen> createState() => _MarketItemFormScreenState();
 }
 
-class _MarketItemFormState extends State<MarketItemForm> {
+class _MarketItemFormScreenState extends State<MarketItemFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _title = TextEditingController();
-  final _description = TextEditingController();
-  final _category = TextEditingController();
-  final _location = TextEditingController();
-  final _price = TextEditingController();
-  final _contact = TextEditingController();
-  String _type = 'Sale';
-  final List<String> _paymentOptions = [];
+  final _titleController = TextEditingController();
+  final _descController = TextEditingController();
+  final _priceController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _contactController = TextEditingController();
 
-  void _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    final item = MarketItem(
-      id: const Uuid().v4(),
-      title: _title.text,
-      description: _description.text,
-      category: _category.text,
-      location: _location.text,
-      price: double.tryParse(_price.text) ?? 0.0,
-      type: _type,
-      photos: [],
-      paymentOptions: _paymentOptions,
-      contact: _contact.text,
+  String _category = 'Crops';
+  String _listingType = 'Sale';
+  bool _isOpenForInvestment = false;
+  String _investmentStatus = 'Indifferent';
+  List<String> _paymentMethods = ['Cash'];
+  bool _loanOption = false;
+  String _selectedFinancier = 'Private';
+
+  final List<String> categories = [
+    'Crops', 'Livestock', 'Land', 'Equipment', 'Services'
+  ];
+  final List<String> listingTypes = [
+    'Sale', 'Lease', 'Barter', 'Request'
+  ];
+  final List<String> investmentStatuses = [
+    'Open', 'Indifferent', 'Not Open'
+  ];
+  final List<String> paymentMethods = [
+    'Cash', 'Bank Transfer', 'Mobile Money', 'QR Code', 'Loan', 'Debit Card'
+  ];
+  final List<String> financiers = [
+    'Private', 'Ministry of Finance', 'Microfinance', 'Cooperative'
+  ];
+
+  void _saveItem() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      final item = MarketItem(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: _titleController.text,
+        description: _descController.text,
+        price: double.tryParse(_priceController.text) ?? 0.0,
+        location: _locationController.text,
+        contactInfo: _contactController.text,
+        category: _category,
+        listingType: _listingType,
+        isOpenForInvestment: _isOpenForInvestment,
+        investmentStatus: _investmentStatus,
+        paymentOptions: _paymentMethods,
+        financier: _loanOption ? _selectedFinancier : null,
+        timestamp: DateTime.now().toIso8601String(),
+      );
+
+      await MarketService().addItem(item);
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
+    }
+  }
+
+  Widget _buildChips<T>({
+    required List<T> items,
+    required List<T> selected,
+    required Function(T, bool) onSelected,
+  }) {
+    return Wrap(
+      spacing: 6.0,
+      children: items.map((item) {
+        final isSelected = selected.contains(item);
+        return FilterChip(
+          label: Text(item.toString()),
+          selected: isSelected,
+          onSelected: (val) => setState(() {
+            onSelected(item, val);
+          }),
+        );
+      }).toList(),
     );
-    final items = await MarketService.loadItems();
-    items.add(item);
-    await MarketService.saveItems(items);
-    if (mounted) Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Listing')),
-      body: Padding(
+      appBar: AppBar(title: const Text('New Market Listing')),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(controller: _title, decoration: const InputDecoration(labelText: 'Title'), validator: (v) => v!.isEmpty ? 'Required' : null),
-              TextFormField(controller: _description, decoration: const InputDecoration(labelText: 'Description'), validator: (v) => v!.isEmpty ? 'Required' : null),
-              TextFormField(controller: _category, decoration: const InputDecoration(labelText: 'Category'), validator: (v) => v!.isEmpty ? 'Required' : null),
-              TextFormField(controller: _location, decoration: const InputDecoration(labelText: 'Location')),
-              TextFormField(controller: _price, decoration: const InputDecoration(labelText: 'Price'), keyboardType: TextInputType.number),
-              TextFormField(controller: _contact, decoration: const InputDecoration(labelText: 'Contact Info')),
-              DropdownButtonFormField<String>(
-                value: _type,
-                items: ['Sale', 'Lease', 'Barter'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                onChanged: (v) => setState(() => _type = v!),
+          child: Column(children: [
+            TextFormField(
+              controller: _titleController,
+              decoration: const InputDecoration(labelText: 'Title'),
+              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+            ),
+            TextFormField(
+              controller: _descController,
+              decoration: const InputDecoration(labelText: 'Description'),
+              maxLines: 3,
+              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+            ),
+            TextFormField(
+              controller: _priceController,
+              decoration: const InputDecoration(labelText: 'Price'),
+              keyboardType: TextInputType.number,
+            ),
+            DropdownButtonFormField(
+              value: _category,
+              items: categories
+                  .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                  .toList(),
+              onChanged: (value) => setState(() => _category = value!),
+              decoration: const InputDecoration(labelText: 'Category'),
+            ),
+            DropdownButtonFormField(
+              value: _listingType,
+              items: listingTypes
+                  .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                  .toList(),
+              onChanged: (value) => setState(() => _listingType = value!),
+              decoration: const InputDecoration(labelText: 'Listing Type'),
+            ),
+            TextFormField(
+              controller: _locationController,
+              decoration: const InputDecoration(labelText: 'Location'),
+            ),
+            TextFormField(
+              controller: _contactController,
+              decoration: const InputDecoration(labelText: 'Contact Info'),
+            ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              title: const Text('Open for Investment'),
+              value: _isOpenForInvestment,
+              onChanged: (val) => setState(() => _isOpenForInvestment = val),
+            ),
+            if (_isOpenForInvestment)
+              DropdownButtonFormField(
+                value: _investmentStatus,
+                items: investmentStatuses
+                    .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                    .toList(),
+                onChanged: (value) =>
+                    setState(() => _investmentStatus = value!),
+                decoration: const InputDecoration(labelText: 'Investment Status'),
               ),
-              Wrap(
-                children: ['Cash', 'Loan', 'Bank', 'QR'].map((opt) => CheckboxListTile(
-                  title: Text(opt),
-                  value: _paymentOptions.contains(opt),
-                  onChanged: (val) {
-                    setState(() {
-                      if (val == true) {
-                        _paymentOptions.add(opt);
-                      } else {
-                        _paymentOptions.remove(opt);
-                      }
-                    });
-                  },
-                )).toList(),
+            const SizedBox(height: 16),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Payment Methods', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            _buildChips<String>(
+              items: paymentMethods,
+              selected: _paymentMethods,
+              onSelected: (val, selected) {
+                if (selected) {
+                  _paymentMethods.add(val);
+                } else {
+                  _paymentMethods.remove(val);
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              title: const Text('Offer Loan Option'),
+              value: _loanOption,
+              onChanged: (val) => setState(() => _loanOption = val),
+            ),
+            if (_loanOption)
+              DropdownButtonFormField(
+                value: _selectedFinancier,
+                items: financiers
+                    .map((f) => DropdownMenuItem(value: f, child: Text(f)))
+                    .toList(),
+                onChanged: (val) => setState(() => _selectedFinancier = val!),
+                decoration: const InputDecoration(labelText: 'Financier'),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(onPressed: _submit, child: const Text('Submit')),
-            ],
-          ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.check),
+              label: const Text('Submit'),
+              onPressed: _saveItem,
+            ),
+          ]),
         ),
       ),
     );
