@@ -1,36 +1,44 @@
 import 'package:flutter/material.dart';
+import '../models/farmer_profile.dart';
+import '../services/profile_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  Widget _buildTile({
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  FarmerProfile? _activeProfile;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final profile = await ProfileService.loadActiveProfile();
+    setState(() {
+      _activeProfile = profile;
+    });
+  }
+
+  Widget buildTile({
     required IconData icon,
-    required String label,
-    required VoidCallback onTap,
+    required String title,
+    required String route,
     Color? color,
   }) {
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 140,
-        height: 140,
+      onTap: () => Navigator.pushNamed(context, route),
+      child: Card(
         margin: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: color ?? Colors.green.shade100,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: Colors.green.shade800),
-            const SizedBox(height: 10),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-          ],
+        child: ListTile(
+          leading: Icon(icon, color: color ?? Colors.green),
+          title: Text(title),
+          trailing: const Icon(Icons.arrow_forward_ios),
         ),
       ),
     );
@@ -38,78 +46,113 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final name = _activeProfile?.name ?? 'Farmer';
+    final region = _activeProfile?.region ?? '';
+
     return Scaffold(
-      appBar: AppBar(title: const Text('AgriX Dashboard')),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Center(
-          child: Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              _buildTile(
-                icon: Icons.person_add,
-                label: 'Register',
-                onTap: () => Navigator.pushNamed(context, '/register'),
-              ),
-              _buildTile(
-                icon: Icons.credit_card,
-                label: 'Loan',
-                onTap: () => Navigator.pushNamed(context, '/loan'),
-              ),
-              _buildTile(
-                icon: Icons.grass,
-                label: 'Crops',
-                onTap: () => Navigator.pushNamed(context, '/crops'),
-              ),
-              _buildTile(
-                icon: Icons.eco,
-                label: 'Soil',
-                onTap: () => Navigator.pushNamed(context, '/soil'),
-              ),
-              _buildTile(
-                icon: Icons.pets,
-                label: 'Livestock',
-                onTap: () => Navigator.pushNamed(context, '/livestock'),
-              ),
-              _buildTile(
-                icon: Icons.tips_and_updates,
-                label: 'Tips',
-                onTap: () => Navigator.pushNamed(context, '/tips'),
-              ),
-              _buildTile(
-                icon: Icons.chat_bubble,
-                label: 'AgriGPT',
-                onTap: () => Navigator.pushNamed(context, '/agrigpt'),
-              ),
-              _buildTile(
-                icon: Icons.sync,
-                label: 'Synchronise',
-                onTap: () => Navigator.pushNamed(context, '/sync'),
-              ),
-              _buildTile(
-                icon: Icons.notifications,
-                label: 'Notifications',
-                onTap: () => Navigator.pushNamed(context, '/notifications'),
-              ),
-              _buildTile(
-                icon: Icons.medical_services,
-                label: 'Get Advice',
-                onTap: () => Navigator.pushNamed(context, '/advice'),
-              ),
-              _buildTile(
-                icon: Icons.book,
-                label: 'Logbook',
-                onTap: () => Navigator.pushNamed(context, '/logbook'),
-              ),
-              _buildTile(
-                icon: Icons.shopping_cart,
-                label: 'Agri Market',
-                onTap: () => Navigator.pushNamed(context, '/market'),
-              ),
-            ],
+      appBar: AppBar(
+        title: Text('Welcome, $name'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => Navigator.pushNamed(context, '/register'),
+            tooltip: 'Edit Profile',
           ),
-        ),
+        ],
+      ),
+      body: ListView(
+        children: [
+          if (region.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Region: $region',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+
+          const Divider(),
+
+          buildTile(
+              icon: Icons.camera_alt,
+              title: 'Scan / Upload Image',
+              route: '/upload'),
+
+          buildTile(
+              icon: Icons.help_outline,
+              title: 'Get Advice (Crops, Soil, Livestock)',
+              route: '/advice'),
+
+          buildTile(
+              icon: Icons.book_outlined,
+              title: 'View Logbook Entries',
+              route: '/logbook'),
+
+          buildTile(
+              icon: Icons.attach_money,
+              title: 'Apply for Loan',
+              route: '/loan'),
+
+          buildTile(
+              icon: Icons.store,
+              title: 'Agri Market',
+              route: '/market'),
+
+          buildTile(
+              icon: Icons.handshake,
+              title: 'Contract Farming Offers',
+              route: '/contracts/list'),
+
+          buildTile(
+              icon: Icons.gavel,
+              title: 'Submit Contract Offer',
+              route: '/contracts/new'),
+
+          buildTile(
+              icon: Icons.insights,
+              title: 'Investor Portal',
+              route: '/investor/register'),
+
+          buildTile(
+              icon: Icons.task,
+              title: 'AREX Officer: Tasks',
+              route: '/officer/tasks'),
+
+          buildTile(
+              icon: Icons.check_circle,
+              title: 'AREX Officer: Assessments',
+              route: '/officer/assessments'),
+
+          buildTile(
+              icon: Icons.tips_and_updates,
+              title: 'Farming Tips',
+              route: '/tips'),
+
+          buildTile(
+              icon: Icons.sync,
+              title: 'Sync & Backup',
+              route: '/sync'),
+
+          buildTile(
+              icon: Icons.notifications,
+              title: 'Notifications',
+              route: '/notifications'),
+
+          buildTile(
+              icon: Icons.chat,
+              title: 'Chat with Others',
+              route: '/chat'),
+
+          buildTile(
+              icon: Icons.help,
+              title: 'Help & FAQs',
+              route: '/help'),
+
+          buildTile(
+              icon: Icons.person_pin,
+              title: 'AgriGPT AI Advisor',
+              route: '/agrigpt'),
+        ],
       ),
     );
   }
