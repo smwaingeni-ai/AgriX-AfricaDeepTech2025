@@ -1,64 +1,69 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-
 import '../models/market_item.dart';
 import '../models/investment_offer.dart';
 
 class MarketService {
-  // File names
-  static const String _marketFile = 'market_items.json';
-  static const String _offersFile = 'investment_offers.json';
-
-  // MARK: - Market Items
-
-  Future<String> _getFilePath(String filename) async {
+  static Future<File> _getMarketFile() async {
     final dir = await getApplicationDocumentsDirectory();
-    return '${dir.path}/$filename';
+    return File('${dir.path}/market_items.json');
   }
 
-  Future<List<MarketItem>> loadMarketItems() async {
+  static Future<File> _getOffersFile() async {
+    final dir = await getApplicationDocumentsDirectory();
+    return File('${dir.path}/investment_offers.json');
+  }
+
+  /// Save market items to file
+  static Future<void> saveItems(List<MarketItem> items) async {
+    final file = await _getMarketFile();
+    await file.writeAsString(MarketItem.encodeList(items));
+  }
+
+  /// Load market items from file
+  static Future<List<MarketItem>> loadItems() async {
     try {
-      final path = await _getFilePath(_marketFile);
-      final file = File(path);
-      if (await file.exists()) {
-        final jsonStr = await file.readAsString();
-        return MarketItem.decode(jsonStr);
-      }
-    } catch (_) {}
-    return [];
+      final file = await _getMarketFile();
+      if (!await file.exists()) return [];
+      final contents = await file.readAsString();
+      return MarketItem.decodeList(contents);
+    } catch (_) {
+      return [];
+    }
   }
 
-  Future<void> saveMarketItems(List<MarketItem> items) async {
-    final path = await _getFilePath(_marketFile);
-    final file = File(path);
-    await file.writeAsString(MarketItem.encode(items));
+  /// Add a new market item
+  static Future<void> addItem(MarketItem item) async {
+    final items = await loadItems();
+    items.add(item);
+    await saveItems(items);
   }
 
-  // MARK: - Investment Offers
+  /// Save investment offers
+  static Future<void> saveOffers(List<InvestmentOffer> offers) async {
+    final file = await _getOffersFile();
+    final jsonList = offers.map((e) => e.toJson()).toList();
+    await file.writeAsString(json.encode(jsonList));
+  }
 
-  Future<List<InvestmentOffer>> loadInvestmentOffers() async {
+  /// Load investment offers
+  static Future<List<InvestmentOffer>> loadOffers() async {
     try {
-      final path = await _getFilePath(_offersFile);
-      final file = File(path);
-      if (await file.exists()) {
-        final jsonStr = await file.readAsString();
-        return InvestmentOffer.decode(jsonStr);
-      }
-    } catch (_) {}
-    return [];
+      final file = await _getOffersFile();
+      if (!await file.exists()) return [];
+      final contents = await file.readAsString();
+      final jsonList = json.decode(contents) as List;
+      return jsonList.map((e) => InvestmentOffer.fromJson(e)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
-  Future<void> saveInvestmentOffers(List<InvestmentOffer> offers) async {
-    final path = await _getFilePath(_offersFile);
-    final file = File(path);
-    await file.writeAsString(InvestmentOffer.encode(offers));
-  }
-
-  // Optional: Append a new offer to existing offers
-  Future<void> addInvestmentOffer(InvestmentOffer newOffer) async {
-    final offers = await loadInvestmentOffers();
-    offers.add(newOffer);
-    await saveInvestmentOffers(offers);
+  /// Add a new investment offer
+  static Future<void> addOffer(InvestmentOffer offer) async {
+    final offers = await loadOffers();
+    offers.add(offer);
+    await saveOffers(offers);
   }
 }
