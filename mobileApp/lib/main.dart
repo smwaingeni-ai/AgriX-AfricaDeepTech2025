@@ -1,95 +1,59 @@
-import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'screens/home_screen.dart';
+import 'screens/upload_screen.dart';
+import 'screens/advice_screen.dart';
+import 'screens/logbook_screen.dart';
+import 'screens/loan_screen.dart';
+import 'screens/market_screen.dart';
+import 'screens/contract_offer_form.dart';
+import 'screens/contract_list_screen.dart';
+import 'screens/investor_screen.dart';
+import 'screens/officer_tasks_screen.dart';
+import 'screens/officer_assessments_screen.dart';
+import 'screens/tips_screen.dart';
+import 'screens/sync_screen.dart';
+import 'screens/notifications_screen.dart';
+import 'screens/chat_screen.dart';
+import 'screens/help_screen.dart';
+import 'screens/agrigpt_screen.dart';
+import 'screens/register_screen.dart';
 
-enum ListingType { sale, lease, barter, request }
-enum ListingCategory { land, crops, livestock, equipment, services }
-enum InvestmentStatus { open, indifferent, closed }
+void main() {
+  runApp(const AgriXApp());
+}
 
-class MarketItem {
-  final String id;
-  final String title;
-  final String description;
-  final ListingType type;
-  final ListingCategory category;
-  final List<String> imagePaths;
-  final String location;
-  final double price;
-  final List<String> paymentOptions;
-  final DateTime createdAt;
+class AgriXApp extends StatelessWidget {
+  const AgriXApp({super.key});
 
-  // Geolocation
-  final double latitude;
-  final double longitude;
-
-  // Investment-related fields
-  final InvestmentStatus investmentStatus;
-  final bool isLoanEligible;
-  final bool ministryFinanceRequested;
-  final List<String> investorOffers; // Could be investor IDs or offer IDs
-
-  MarketItem({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.type,
-    required this.category,
-    required this.imagePaths,
-    required this.location,
-    required this.price,
-    required this.paymentOptions,
-    required this.createdAt,
-    required this.latitude,
-    required this.longitude,
-    required this.investmentStatus,
-    required this.isLoanEligible,
-    required this.ministryFinanceRequested,
-    required this.investorOffers,
-  });
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'description': description,
-        'type': type.name,
-        'category': category.name,
-        'imagePaths': imagePaths,
-        'location': location,
-        'price': price,
-        'paymentOptions': paymentOptions,
-        'createdAt': createdAt.toIso8601String(),
-        'latitude': latitude,
-        'longitude': longitude,
-        'investmentStatus': investmentStatus.name,
-        'isLoanEligible': isLoanEligible,
-        'ministryFinanceRequested': ministryFinanceRequested,
-        'investorOffers': investorOffers,
-      };
-
-  factory MarketItem.fromJson(Map<String, dynamic> json) => MarketItem(
-        id: json['id'],
-        title: json['title'],
-        description: json['description'],
-        type: ListingType.values.firstWhere((e) => e.name == json['type']),
-        category:
-            ListingCategory.values.firstWhere((e) => e.name == json['category']),
-        imagePaths: List<String>.from(json['imagePaths']),
-        location: json['location'],
-        price: (json['price'] as num).toDouble(),
-        paymentOptions: List<String>.from(json['paymentOptions']),
-        createdAt: DateTime.parse(json['createdAt']),
-        latitude: (json['latitude'] as num).toDouble(),
-        longitude: (json['longitude'] as num).toDouble(),
-        investmentStatus: InvestmentStatus.values
-            .firstWhere((e) => e.name == json['investmentStatus']),
-        isLoanEligible: json['isLoanEligible'],
-        ministryFinanceRequested: json['ministryFinanceRequested'],
-        investorOffers: List<String>.from(json['investorOffers']),
-      );
-
-  static List<MarketItem> decode(String marketJson) =>
-      (jsonDecode(marketJson) as List<dynamic>)
-          .map<MarketItem>((item) => MarketItem.fromJson(item))
-          .toList();
-
-  static String encode(List<MarketItem> items) =>
-      jsonEncode(items.map((e) => e.toJson()).toList());
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'AgriX',
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomeScreen(),
+        '/upload': (context) => const UploadScreen(),
+        '/advice': (context) => const AdviceScreen(),
+        '/logbook': (context) => const LogbookScreen(),
+        '/loan': (context) => const LoanScreen(),
+        '/market': (context) => const MarketScreen(),
+        '/contracts/new': (context) => const ContractOfferFormScreen(),
+        '/contracts/list': (context) => const ContractListScreen(),
+        '/investor/register': (context) => const InvestorScreen(),
+        '/officer/tasks': (context) => const OfficerTasksScreen(),
+        '/officer/assessments': (context) => const OfficerAssessmentsScreen(),
+        '/tips': (context) => const TipsScreen(),
+        '/sync': (context) => const SyncScreen(),
+        '/notifications': (context) => const NotificationsScreen(),
+        '/chat': (context) => const ChatScreen(),
+        '/help': (context) => const HelpScreen(),
+        '/agrigpt': (context) => const AgriGPTScreen(),
+        '/register': (context) => const RegisterScreen(),
+      },
+    );
+  }
 }
