@@ -9,10 +9,17 @@ class LoanScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Apply for a Loan'),
       ),
-      body: Center(
-        child: Text(
-          'Loan Application Screen (Coming Soon)',
-          style: Theme.of(context).textTheme.headline6,
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            'Loan Application Screen (Coming Soon)',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );
