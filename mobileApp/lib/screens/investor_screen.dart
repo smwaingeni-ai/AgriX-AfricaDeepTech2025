@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../models/investor_profile.dart';
-import '../../services/investor_service.dart';
+import '../models/investor_profile.dart';
+import '../services/investor_service.dart';
 
 class InvestorScreen extends StatefulWidget {
   const InvestorScreen({super.key});
