@@ -41,6 +41,12 @@ class ProfileService {
     await prefs.setString(_activeKey, id);
   }
 
+  /// Saves a profile and sets it as active
+  static Future<void> saveActiveProfile(FarmerProfile profile) async {
+    await saveProfile(profile);
+    await setActiveProfileId(profile.id);
+  }
+
   /// Loads the currently active FarmerProfile
   static Future<FarmerProfile?> loadActiveProfile() async {
     final prefs = await SharedPreferences.getInstance();
