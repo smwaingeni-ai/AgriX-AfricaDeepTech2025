@@ -12,7 +12,6 @@ class ContractOfferFormScreen extends StatefulWidget {
 class _ContractOfferFormScreenState extends State<ContractOfferFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _contract = ContractOffer.empty();
-
   bool _submitting = false;
 
   Future<void> _submitForm() async {
@@ -33,7 +32,7 @@ class _ContractOfferFormScreenState extends State<ContractOfferFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Post New Contract')),
+      appBar: AppBar(title: const Text('Submit Contract Offer')),
       body: _submitting
           ? const Center(child: CircularProgressIndicator())
           : Padding(
@@ -45,18 +44,18 @@ class _ContractOfferFormScreenState extends State<ContractOfferFormScreen> {
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Contract Title'),
                       onSaved: (val) => _contract.title = val ?? '',
-                      validator: (val) => val!.isEmpty ? 'Required' : null,
+                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
                     ),
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Parties Involved'),
                       onSaved: (val) => _contract.parties = val ?? '',
-                      validator: (val) => val!.isEmpty ? 'Required' : null,
+                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
                     ),
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Amount (USD)'),
                       keyboardType: TextInputType.number,
                       onSaved: (val) => _contract.amount = double.tryParse(val ?? '0') ?? 0,
-                      validator: (val) => val!.isEmpty ? 'Required' : null,
+                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
                     ),
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Duration (e.g. 12 months)'),
@@ -65,24 +64,24 @@ class _ContractOfferFormScreenState extends State<ContractOfferFormScreen> {
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Crop or Livestock Type'),
                       onSaved: (val) => _contract.cropOrLivestockType = val ?? '',
-                      validator: (val) => val!.isEmpty ? 'Required' : null,
+                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
                     ),
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Location'),
                       onSaved: (val) => _contract.location = val ?? '',
-                      validator: (val) => val!.isEmpty ? 'Required' : null,
+                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
                     ),
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Contract Terms / Description'),
                       maxLines: 4,
                       onSaved: (val) => _contract.terms = val ?? '',
-                      validator: (val) => val!.isEmpty ? 'Required' : null,
+                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: _submitForm,
                       child: const Text('Submit Contract'),
-                    )
+                    ),
                   ],
                 ),
               ),
