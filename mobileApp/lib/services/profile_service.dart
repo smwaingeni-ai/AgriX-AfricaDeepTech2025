@@ -7,20 +7,20 @@ import '../models/farmer_profile.dart';
 class ProfileService {
   static const _activeKey = 'active_farmer_profile_id';
 
-  /// Gets the app's document directory path
+  /// Gets the path to the app's document directory
   static Future<String> _getDirectoryPath() async {
     final dir = await getApplicationDocumentsDirectory();
     return dir.path;
   }
 
-  /// Saves a profile to local file storage
+  /// Saves a FarmerProfile to a file
   static Future<void> saveProfile(FarmerProfile profile) async {
     final path = await _getDirectoryPath();
     final file = File('$path/farmer_${profile.id}.json');
     await file.writeAsString(jsonEncode(profile.toJson()));
   }
 
-  /// Loads all saved profiles
+  /// Loads all FarmerProfiles saved locally
   static Future<List<FarmerProfile>> loadAllProfiles() async {
     final path = await _getDirectoryPath();
     final dir = Directory(path);
@@ -35,13 +35,13 @@ class ProfileService {
     }).toList();
   }
 
-  /// Sets the active profile by ID
+  /// Sets the ID of the active profile (SharedPreferences)
   static Future<void> setActiveProfileId(String id) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_activeKey, id);
   }
 
-  /// Gets the active profile by loading the ID from SharedPreferences
+  /// Loads the currently active FarmerProfile
   static Future<FarmerProfile?> loadActiveProfile() async {
     final prefs = await SharedPreferences.getInstance();
     final id = prefs.getString(_activeKey);
@@ -49,7 +49,6 @@ class ProfileService {
 
     final path = await _getDirectoryPath();
     final file = File('$path/farmer_$id.json');
-
     if (!file.existsSync()) return null;
 
     final content = await file.readAsString();
