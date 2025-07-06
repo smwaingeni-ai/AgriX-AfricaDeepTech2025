@@ -39,6 +39,7 @@ class MarketItem {
     required this.postedAt,
   });
 
+  /// Creates an empty MarketItem
   factory MarketItem.empty() => MarketItem(
         id: '',
         title: '',
@@ -59,6 +60,7 @@ class MarketItem {
         postedAt: DateTime.now(),
       );
 
+  /// Converts a MarketItem to JSON
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
@@ -79,6 +81,7 @@ class MarketItem {
         'postedAt': postedAt.toIso8601String(),
       };
 
+  /// Creates a MarketItem from JSON
   factory MarketItem.fromJson(Map<String, dynamic> json) => MarketItem(
         id: json['id'] ?? '',
         title: json['title'] ?? '',
@@ -99,9 +102,11 @@ class MarketItem {
         postedAt: DateTime.tryParse(json['postedAt'] ?? '') ?? DateTime.now(),
       );
 
+  /// Encode list of MarketItems
   static String encodeList(List<MarketItem> items) =>
       json.encode(items.map((item) => item.toJson()).toList());
 
+  /// Decode list of MarketItems
   static List<MarketItem> decodeList(String jsonString) =>
       (json.decode(jsonString) as List<dynamic>)
           .map((e) => MarketItem.fromJson(e))
