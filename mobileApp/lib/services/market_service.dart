@@ -5,30 +5,32 @@ import '../models/market_item.dart';
 import '../models/investment_offer.dart';
 
 class MarketService {
+  /// Get file to store market items
   static Future<File> _getMarketFile() async {
     final dir = await getApplicationDocumentsDirectory();
     return File('${dir.path}/market_items.json');
   }
 
+  /// Get file to store investment offers
   static Future<File> _getOffersFile() async {
     final dir = await getApplicationDocumentsDirectory();
     return File('${dir.path}/investment_offers.json');
   }
 
-  /// Save market items to file
+  /// Save all market items to file
   static Future<void> saveItems(List<MarketItem> items) async {
     final file = await _getMarketFile();
     await file.writeAsString(MarketItem.encodeList(items));
   }
 
-  /// Load market items from file
+  /// Load all market items from file
   static Future<List<MarketItem>> loadItems() async {
     try {
       final file = await _getMarketFile();
       if (!await file.exists()) return [];
       final contents = await file.readAsString();
       return MarketItem.decodeList(contents);
-    } catch (_) {
+    } catch (e) {
       return [];
     }
   }
@@ -40,22 +42,22 @@ class MarketService {
     await saveItems(items);
   }
 
-  /// Save investment offers
+  /// Save all investment offers to file
   static Future<void> saveOffers(List<InvestmentOffer> offers) async {
     final file = await _getOffersFile();
     final jsonList = offers.map((e) => e.toJson()).toList();
     await file.writeAsString(json.encode(jsonList));
   }
 
-  /// Load investment offers
+  /// Load all investment offers from file
   static Future<List<InvestmentOffer>> loadOffers() async {
     try {
       final file = await _getOffersFile();
       if (!await file.exists()) return [];
       final contents = await file.readAsString();
-      final jsonList = json.decode(contents) as List;
+      final jsonList = json.decode(contents) as List<dynamic>;
       return jsonList.map((e) => InvestmentOffer.fromJson(e)).toList();
-    } catch (_) {
+    } catch (e) {
       return [];
     }
   }
