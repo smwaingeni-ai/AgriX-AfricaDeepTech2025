@@ -32,7 +32,11 @@ class _OfficerTasksScreenState extends State<OfficerTasksScreen> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Task "${_tasks[index]['title']}" marked as completed.')),
+      SnackBar(
+        content: Text(
+          'Task "${_tasks[index]['title']}" marked as completed.',
+        ),
+      ),
     );
   }
 
@@ -47,7 +51,7 @@ class _OfficerTasksScreenState extends State<OfficerTasksScreen> {
         itemBuilder: (context, index) {
           final task = _tasks[index];
           return Card(
-            margin: const EdgeInsets.all(8),
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: ListTile(
               title: Text(task['title'] ?? ''),
               subtitle: Text(task['description'] ?? ''),
