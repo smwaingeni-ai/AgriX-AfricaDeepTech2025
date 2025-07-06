@@ -33,6 +33,31 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _buildMessageBubble(ChatMessage msg) {
+    final isUser = msg.sender == 'You';
+    return Align(
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 14.0),
+        decoration: BoxDecoration(
+          color: isUser ? Colors.green.shade100 : Colors.grey.shade300,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Text(
+          '${msg.sender}: ${msg.message}',
+          style: const TextStyle(fontSize: 15),
+        ),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Chat with AgriGPT')),
@@ -42,40 +67,29 @@ class _ChatScreenState extends State<ChatScreen> {
             child: ListView.builder(
               padding: const EdgeInsets.all(8.0),
               itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final msg = _messages[index];
-                final isUser = msg.sender == 'You';
-                return Align(
-                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 4.0),
-                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-                    decoration: BoxDecoration(
-                      color: isUser ? Colors.green.shade100 : Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Text('${msg.sender}: ${msg.message}'),
-                  ),
-                );
-              },
+              itemBuilder: (context, index) => _buildMessageBubble(_messages[index]),
             ),
           ),
           if (_isSending)
             const Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: EdgeInsets.symmetric(vertical: 8.0),
               child: CircularProgressIndicator(),
             ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    decoration: const InputDecoration(hintText: 'Type your message...'),
+                    decoration: const InputDecoration(
+                      hintText: 'Type your message...',
+                      border: OutlineInputBorder(),
+                    ),
                     onSubmitted: (_) => _sendMessage(),
                   ),
                 ),
+                const SizedBox(width: 8),
                 IconButton(
                   icon: const Icon(Icons.send),
                   onPressed: _sendMessage,
