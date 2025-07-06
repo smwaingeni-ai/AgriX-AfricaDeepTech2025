@@ -21,7 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     _formKey.currentState!.save();
 
-    // Optionally assign a UUID or timestamp-based ID
+    // Assign a unique ID based on timestamp
     _profile.id = DateTime.now().millisecondsSinceEpoch.toString();
 
     await ProfileService.saveActiveProfile(_profile);
