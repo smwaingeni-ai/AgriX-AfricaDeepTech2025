@@ -24,15 +24,21 @@ dependencies:
   geolocator: ^14.0.2
   geocoding: ^4.0.0
   url_launcher: ^6.2.1
-  provider: ^6.1.1 # Optional if you're managing state
-  file_picker: ^6.1.1 # Optional if you want file upload support
-  uuid: ^4.0.0 # Useful for generating unique IDs
-  json_annotation: ^4.8.1 # Helps if you plan to use build_runner for models
+  provider: ^6.1.1
+  file_picker: ^6.1.1
+  uuid: ^4.0.0
+  json_annotation: ^4.8.1
+  encrypt: ^5.0.1
+
+  # ✅ Firebase dependencies (latest stable versions)
+  firebase_core: ^3.1.0
+  cloud_firestore: ^4.15.4
+  firebase_auth: ^5.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^2.4.7 # Optional if using code generation for JSON or provider
+  build_runner: ^2.4.7
   json_serializable: ^6.7.1
 
 flutter:
@@ -41,4 +47,4 @@ flutter:
   assets:
     - assets/tflite/crop_disease_model.tflite
     - assets/tflite/labels.txt
-    - assets/images/ # Add any image folders if needed
+    - assets/images/
