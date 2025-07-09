@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/investor_profile.dart';
-import '../services/investor_service.dart';
+import '../../models/investor_profile.dart';
+import '../../services/investor_service.dart';
 
 class InvestorScreen extends StatefulWidget {
   const InvestorScreen({super.key});
@@ -11,16 +11,22 @@ class InvestorScreen extends StatefulWidget {
 
 class _InvestorScreenState extends State<InvestorScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _investor = InvestorProfile.empty();
+  late InvestorProfile _investor;
 
   bool _submitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _investor = InvestorProfile.empty(); // ✅ Requires .empty() factory in model
+  }
 
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 
     setState(() => _submitting = true);
-    await InvestorService().saveInvestorProfile(_investor);
+    await InvestorService.saveInvestorProfile(_investor); // ✅ static method preferred
     setState(() => _submitting = false);
 
     if (!mounted) return;
@@ -45,20 +51,20 @@ class _InvestorScreenState extends State<InvestorScreen> {
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Full Name'),
                       onSaved: (val) => _investor.name = val ?? '',
-                      validator: (val) => val!.isEmpty ? 'Required' : null,
+                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
                     ),
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Email'),
                       keyboardType: TextInputType.emailAddress,
                       onSaved: (val) => _investor.email = val ?? '',
                       validator: (val) =>
-                          val!.isEmpty || !val.contains('@') ? 'Enter valid email' : null,
+                          val == null || !val.contains('@') ? 'Enter valid email' : null,
                     ),
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Phone Number'),
                       keyboardType: TextInputType.phone,
                       onSaved: (val) => _investor.phone = val ?? '',
-                      validator: (val) => val!.isEmpty ? 'Required' : null,
+                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
                     ),
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Areas of Interest'),
