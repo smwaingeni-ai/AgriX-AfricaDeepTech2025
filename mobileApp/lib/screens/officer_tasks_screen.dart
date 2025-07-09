@@ -12,17 +12,17 @@ class _OfficerTasksScreenState extends State<OfficerTasksScreen> {
     {
       'title': 'Inspect Field in Region A',
       'description': 'Check maize crop progress and pest control.',
-      'status': 'Pending'
+      'status': 'Pending',
     },
     {
       'title': 'Monitor Livestock Health',
       'description': 'Review cattle health reports from Farm B.',
-      'status': 'In Progress'
+      'status': 'In Progress',
     },
     {
       'title': 'Verify Input Distribution',
       'description': 'Ensure fertilizer delivery was completed.',
-      'status': 'Completed'
+      'status': 'Completed',
     },
   ];
 
@@ -36,6 +36,7 @@ class _OfficerTasksScreenState extends State<OfficerTasksScreen> {
         content: Text(
           'Task "${_tasks[index]['title']}" marked as completed.',
         ),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -50,21 +51,21 @@ class _OfficerTasksScreenState extends State<OfficerTasksScreen> {
         itemCount: _tasks.length,
         itemBuilder: (context, index) {
           final task = _tasks[index];
+          final status = task['status'] ?? '';
+
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: ListTile(
               title: Text(task['title'] ?? ''),
               subtitle: Text(task['description'] ?? ''),
               trailing: Text(
-                task['status'] ?? '',
+                status,
                 style: TextStyle(
-                  color: task['status'] == 'Completed' ? Colors.green : Colors.orange,
+                  color: status == 'Completed' ? Colors.green : Colors.orange,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              onTap: task['status'] != 'Completed'
-                  ? () => _markTaskAsCompleted(index)
-                  : null,
+              onTap: status != 'Completed' ? () => _markTaskAsCompleted(index) : null,
             ),
           );
         },
