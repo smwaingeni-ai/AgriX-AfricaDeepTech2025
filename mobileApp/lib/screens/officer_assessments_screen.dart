@@ -33,6 +33,7 @@ class _OfficerAssessmentsScreenState extends State<OfficerAssessmentsScreen> {
       });
 
       _formKey.currentState!.reset();
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Assessment submitted')),
       );
