@@ -19,14 +19,23 @@ class _ContractOfferFormScreenState extends State<ContractOfferFormScreen> {
     _formKey.currentState!.save();
 
     setState(() => _submitting = true);
-    await ContractService().saveContract(_contract);
-    setState(() => _submitting = false);
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Contract offer posted successfully!')),
-    );
-    Navigator.pop(context);
+    try {
+      await ContractService().saveContract(_contract);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Contract offer posted successfully!')),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error submitting contract: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
+    }
   }
 
   @override
@@ -41,51 +50,65 @@ class _ContractOfferFormScreenState extends State<ContractOfferFormScreen> {
                 key: _formKey,
                 child: ListView(
                   children: [
-                    TextFormField(
-                      decoration: const InputDecoration(labelText: 'Contract Title'),
+                    _buildTextField(
+                      label: 'Contract Title',
                       onSaved: (val) => _contract.title = val ?? '',
-                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
                     ),
-                    TextFormField(
-                      decoration: const InputDecoration(labelText: 'Parties Involved'),
+                    _buildTextField(
+                      label: 'Parties Involved',
                       onSaved: (val) => _contract.parties = val ?? '',
-                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
                     ),
-                    TextFormField(
-                      decoration: const InputDecoration(labelText: 'Amount (USD)'),
+                    _buildTextField(
+                      label: 'Amount (USD)',
                       keyboardType: TextInputType.number,
-                      onSaved: (val) => _contract.amount = double.tryParse(val ?? '0') ?? 0,
-                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+                      onSaved: (val) => _contract.amount = double.tryParse(val ?? '0') ?? 0.0,
                     ),
-                    TextFormField(
-                      decoration: const InputDecoration(labelText: 'Duration (e.g. 12 months)'),
+                    _buildTextField(
+                      label: 'Duration (e.g. 12 months)',
                       onSaved: (val) => _contract.duration = val ?? '',
+                      required: false,
                     ),
-                    TextFormField(
-                      decoration: const InputDecoration(labelText: 'Crop or Livestock Type'),
+                    _buildTextField(
+                      label: 'Crop or Livestock Type',
                       onSaved: (val) => _contract.cropOrLivestockType = val ?? '',
-                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
                     ),
-                    TextFormField(
-                      decoration: const InputDecoration(labelText: 'Location'),
+                    _buildTextField(
+                      label: 'Location',
                       onSaved: (val) => _contract.location = val ?? '',
-                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
                     ),
-                    TextFormField(
-                      decoration: const InputDecoration(labelText: 'Contract Terms / Description'),
-                      maxLines: 4,
+                    _buildTextField(
+                      label: 'Contract Terms / Description',
                       onSaved: (val) => _contract.terms = val ?? '',
-                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+                      maxLines: 4,
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: _submitForm,
+                      onPressed: _submitting ? null : _submitForm,
                       child: const Text('Submit Contract'),
                     ),
                   ],
                 ),
               ),
             ),
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    TextInputType keyboardType = TextInputType.text,
+    required void Function(String?) onSaved,
+    bool required = true,
+    int maxLines = 1,
+  }) {
+    return TextFormField(
+      decoration: InputDecoration(labelText: label),
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      onSaved: onSaved,
+      validator: (val) {
+        if (!required) return null;
+        return (val == null || val.isEmpty) ? 'Required' : null;
+      },
     );
   }
 }
