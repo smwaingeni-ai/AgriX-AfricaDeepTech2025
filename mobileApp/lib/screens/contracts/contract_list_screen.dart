@@ -20,7 +20,7 @@ class _ContractListScreenState extends State<ContractListScreen> {
   }
 
   Future<void> _loadContracts() async {
-    final contracts = await ContractService().loadContracts();
+    final contracts = await ContractService.loadOffers(); // ✅ fixed method
     setState(() {
       _contracts = contracts;
       _loading = false;
@@ -43,10 +43,10 @@ class _ContractListScreenState extends State<ContractListScreen> {
                       margin: const EdgeInsets.all(8),
                       child: ListTile(
                         title: Text(contract.title),
-                        subtitle: Text('Amount: \$${contract.amount.toStringAsFixed(2)}'),
+                        subtitle: Text('Amount: \$${contract.fundingAmount.toStringAsFixed(2)}'), // ✅ fixed field
                         trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
-                          // TODO: Implement detail view if needed
+                          // TODO: Add navigation to detail screen if needed
                         },
                       ),
                     );
