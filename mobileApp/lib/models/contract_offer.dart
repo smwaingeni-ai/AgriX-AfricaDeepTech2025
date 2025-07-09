@@ -1,21 +1,21 @@
 import 'package:flutter/foundation.dart';
 
 class ContractOffer {
-  final String id;
-  final String title;
-  final String description;
-  final String category; // e.g., "Poultry", "Tomatoes", "Maize", "Goats"
-  final String sponsorName;
-  final String location;
-  final double fundingAmount;
-  final String duration; // e.g., "3 months", "1 year"
-  final String requirements; // farmer eligibility or conditions
-  final String paymentTerms; // e.g., profit share, fixed return
-  final String contactPhone;
-  final String contactEmail;
-  final DateTime createdAt;
-  final bool isVerified;
-  final String status; // Open, Closed, Completed
+  String id;
+  String title;
+  String description;
+  String category;
+  String sponsorName;
+  String location;
+  double fundingAmount;
+  String duration;
+  String requirements;
+  String paymentTerms;
+  String contactPhone;
+  String contactEmail;
+  DateTime createdAt;
+  bool isVerified;
+  String status;
 
   ContractOffer({
     required this.id,
@@ -34,6 +34,27 @@ class ContractOffer {
     this.isVerified = false,
     this.status = "Open",
   });
+
+  /// ✅ Needed for form screen
+  factory ContractOffer.empty() {
+    return ContractOffer(
+      id: UniqueKey().toString(),
+      title: '',
+      description: '',
+      category: '',
+      sponsorName: '',
+      location: '',
+      fundingAmount: 0.0,
+      duration: '',
+      requirements: '',
+      paymentTerms: '',
+      contactPhone: '',
+      contactEmail: '',
+      createdAt: DateTime.now(),
+      isVerified: false,
+      status: 'Open',
+    );
+  }
 
   factory ContractOffer.fromJson(Map<String, dynamic> json) {
     return ContractOffer(
