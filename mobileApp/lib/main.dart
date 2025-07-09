@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'screens/home_screen.dart';
 import 'screens/upload_screen.dart';
 import 'screens/advice_screen.dart';
@@ -18,7 +19,9 @@ import 'screens/help_screen.dart';
 import 'screens/agrigpt_screen.dart';
 import 'screens/register_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // ✅ Firebase initialized
   runApp(const AgriXApp());
 }
 
