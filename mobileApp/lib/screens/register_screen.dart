@@ -59,7 +59,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     child: const Text('Back to Home'),
-                  )
+                  ),
                 ],
               )
             : Form(
@@ -90,7 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ElevatedButton(
                       onPressed: _saveProfile,
                       child: const Text('Generate QR'),
-                    )
+                    ),
                   ],
                 ),
               ),
